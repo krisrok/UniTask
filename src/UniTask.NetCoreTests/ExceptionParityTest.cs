@@ -34,7 +34,13 @@ namespace NetCoreTests
         }
 
         [Fact]
-        public async Task ThrownExceptionsMatch_WhenAll()
+        public async Task ThrownExceptionsMatch_WhenAll_SingleTask()
+        {
+            await AssertThrownExceptionsMatch(() => Task.WhenAll(ThrowingTask()));
+        }
+
+        [Fact]
+        public async Task ThrownExceptionsMatch_WhenAll_MultipleTasks()
         {
             await AssertThrownExceptionsMatch(() => Task.WhenAll(ThrowingTask(), ThrowingTask()));
         }
@@ -58,7 +64,13 @@ namespace NetCoreTests
         }
 
         [Fact]
-        public async Task ThrownExceptionMatchesTaskException_WhenAll()
+        public async Task ThrownExceptionMatchesTaskException_WhenAll_SingleTask()
+        {
+            await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAll(ThrowingTask()));
+        }
+
+        [Fact]
+        public async Task ThrownExceptionMatchesTaskException_WhenAll_MultipleTasks()
         {
             await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAll(ThrowingTask(), ThrowingTask()));
         }
