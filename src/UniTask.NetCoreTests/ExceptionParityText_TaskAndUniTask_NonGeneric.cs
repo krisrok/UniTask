@@ -36,6 +36,15 @@ namespace NetCoreTests
         }
 
         [Fact]
+        public async Task WhenAll_Nested()
+        {
+            await AssertEqualExceptionBehaviour(
+                async () => await ThrowingTaskNested(),
+                async () => await ThrowingUniTaskNested()
+            );
+        }
+
+        [Fact]
         public async Task WhenAny()
         {
             await AssertEqualExceptionBehaviour(
@@ -74,16 +83,28 @@ namespace NetCoreTests
             Assert.IsType(taskEx.GetType(), uniTaskEx);
         }
 
-        protected async Task ThrowingTask()
+        private async Task ThrowingTask()
         {
             await Task.Yield();
             throw new TestException();
         }
 
-        protected async UniTask ThrowingUniTask()
+        private async UniTask ThrowingUniTask()
         {
             await UniTask.Yield();
             throw new TestException();
+        }
+
+        private async Task ThrowingTaskNested()
+        {
+            await Task.Yield();
+            await Task.WhenAll(ThrowingTask(), ThrowingTask());
+        }
+
+        private async UniTask ThrowingUniTaskNested()
+        {
+            await UniTask.Yield();
+            await UniTask.WhenAll(ThrowingUniTask(), ThrowingUniTask());
         }
 
         private class TestException : Exception
