@@ -6,7 +6,7 @@ using Xunit.Sdk;
 
 namespace NetCoreTests
 {
-    public class ExceptionParityText_TaskAndUniTask_NonGeneric
+    public class ExceptionParityTest_TaskAndUniTask_NonGeneric
     {
         [Fact]
         public async Task Single()
