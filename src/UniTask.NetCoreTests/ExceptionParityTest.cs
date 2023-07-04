@@ -16,13 +16,13 @@ namespace NetCoreTests
         [Fact]
         public async Task ThrownExceptionsMatch_WhenAll()
         {
-            await AssertThrownExceptionsMatch(() => Task.WhenAll(ThrowingTask(1), ThrowingTask(2)));
+            await AssertThrownExceptionsMatch(() => Task.WhenAll(ThrowingTask(), ThrowingTask()));
         }
 
         [Fact]
         public async Task ThrownExceptionsMatch_WhenAny()
         {
-            await AssertThrownExceptionsMatch(() => Task.WhenAny(ThrowingTask(1), ThrowingTask(2)));
+            await AssertThrownExceptionsMatch(() => Task.WhenAny(ThrowingTask(), ThrowingTask()));
         }
 
         [Fact]
@@ -40,13 +40,13 @@ namespace NetCoreTests
         [Fact]
         public async Task ThrownExceptionMatchesTaskException_WhenAll()
         {
-            await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAll(ThrowingTask(1), ThrowingTask(2)));
+            await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAll(ThrowingTask(), ThrowingTask()));
         }
 
         [Fact]
         public async Task ThrownExceptionMatchesTaskException_WhenAny()
         {
-            await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAny(ThrowingTask(1), ThrowingTask(2)));
+            await AssertUniTaskThrownExceptionMatchesTaskException(() => Task.WhenAny(ThrowingTask(), ThrowingTask()));
         }
 
         [Fact]
@@ -95,20 +95,38 @@ namespace NetCoreTests
 
         private static async Task AssertTaskThrowsAndExceptionMatches(Func<Task> t, Exception ex)
         {
+            if(ex == null)
+            {
+                await AssertAsUniTaskDoesNotThrow(t);
+                return;
+            }
+
             await Assert.ThrowsAsync(ex.GetType(),
                 async () => await t().AsUniTask());
         }
 
-        private async static Task ThrowingTask(int delayMs = 1)
+        private static async Task AssertAsUniTaskDoesNotThrow(Func<Task> t)
         {
-            await Task.Delay(delayMs);
+            try
+            {
+                await t().AsUniTask();
+            }
+            catch(Exception ex)
+            {
+                throw new XunitException($"Expected: No exception thrown\nActual:   {ex}");
+            }
+        }
+
+        private async Task ThrowingTask()
+        {
+            await Task.Delay(1);
             throw new TestException();
         }
 
         private async Task ThrowingTaskNested()
         {
             await Task.Delay(1);
-            await Task.WhenAll(ThrowingTask(1), ThrowingTask(2));
+            await Task.WhenAll(ThrowingTask(), ThrowingTask());
         }
 
         private class TestException : Exception
