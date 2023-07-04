@@ -2,11 +2,31 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Sdk;
 
 namespace NetCoreTests
 {
-    public class ExceptionParityTest
+    public class ExceptionParityText_NonGeneric : ExceptionParityTest<Task>
     {
+        protected override async Task ThrowingTask()
+        {
+            await Task.Delay(1);
+            throw new TestException();
+        }
+    }
+
+    public class ExceptionParityText_Generic : ExceptionParityTest<Task<bool>>
+    {
+        protected override async Task<bool> ThrowingTask()
+        {
+            await Task.Delay(1);
+            throw new TestException();
+        }
+    }
+
+    public abstract class ExceptionParityTest<T>
+        where T : Task
+    { 
         [Fact]
         public async Task ThrownExceptionsMatch_Single()
         {
@@ -117,11 +137,7 @@ namespace NetCoreTests
             }
         }
 
-        private async Task ThrowingTask()
-        {
-            await Task.Delay(1);
-            throw new TestException();
-        }
+        protected abstract T ThrowingTask();
 
         private async Task ThrowingTaskNested()
         {
@@ -129,7 +145,7 @@ namespace NetCoreTests
             await Task.WhenAll(ThrowingTask(), ThrowingTask());
         }
 
-        private class TestException : Exception
+        protected class TestException : Exception
         { }
     }
 }
