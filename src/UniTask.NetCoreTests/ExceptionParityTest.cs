@@ -6,7 +6,7 @@ using Xunit.Sdk;
 
 namespace NetCoreTests
 {
-    public class ExceptionParityText_Generic : ExceptionParityTest<Task<bool>>
+    public class ExceptionParityTest_Generic : ExceptionParityTest<Task<bool>>
     {
         protected override async Task<bool> ThrowingTask()
         {
@@ -15,7 +15,7 @@ namespace NetCoreTests
         }
     }
 
-    public class ExceptionParityText_NonGeneric : ExceptionParityTest<Task>
+    public class ExceptionParityTest_NonGeneric : ExceptionParityTest<Task>
     {
         protected override async Task ThrowingTask()
         {
@@ -28,7 +28,6 @@ namespace NetCoreTests
         where T : Task
     {
         #region ThrownExceptionMatchesTaskException
-
         [Fact]
         public async Task ThrownExceptionMatchesTaskException_Single()
         {
